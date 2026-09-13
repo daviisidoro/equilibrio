@@ -1,16 +1,37 @@
-# React + Vite
+# Equilíbrio
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Aplicativo React para acompanhar finanças e hábitos, com autenticação e sincronização pelo Firebase e um modo offline temporário.
 
-Currently, two official plugins are available:
+## Recuperação do código
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+O ZIP e a versão atual da branch `main` não continham a pasta `src`. O componente original `equilibrio.jsx` foi recuperado do commit [`94557e7`](https://github.com/daviisidoro/equilibrio/commit/94557e71543bc1dd0edcb5086b4bbadacd4a37e2), anterior ao commit que o excluiu. Ele foi colocado em `src/App.jsx`, junto com o ponto de entrada e o CSS necessários para o Vite.
 
-## React Compiler
+## Rodar localmente
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Testado com Node.js 24.
 
-## Expanding the Oxlint configuration
+```bash
+npm ci
+npm run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+Para conferir antes de publicar:
+
+```bash
+npm run lint
+npm run build
+```
+
+O modo offline permite testar sem entrar no Firebase, mas os dados ficam só na memória e desaparecem ao recarregar a página. Para usar autenticação e sincronização, configure no console do Firebase os métodos de login desejados, os domínios autorizados e as regras do Firestore para que cada usuário acesse apenas seus próprios dados.
+
+## Enviar ao GitHub
+
+No diretório do projeto, use um clone do repositório e copie para ele os arquivos desta versão recuperada (sem `node_modules` e `dist`). Depois:
+
+```bash
+git add .
+git commit -m "Recupera aplicativo e corrige build"
+git push origin main
+```
+
+Se aparecer um erro de autenticação no `git push`, entre na sua conta pelo GitHub Desktop ou configure a autenticação do Git para sua conta. Não inclua senhas, tokens ou arquivos `.env` no commit.

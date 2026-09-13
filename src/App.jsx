@@ -47,7 +47,7 @@ const monthKey = (date) => dateKey(date).slice(0, 7);
 const Card = ({ children, className = '', delay = 0, onClick }) => (
   <div 
     onClick={onClick}
-    className={`bg-[#121212] rounded-[32px] p-6 transition-all duration-300 ${onClick ? 'cursor-pointer hover:bg-[#1a1a1a] active:scale-[0.98]' : ''} animate-in fade-in slide-in-from-bottom-4 fill-mode-both ${className}`}
+    className={`bg-[#202020] rounded-[32px] p-6 transition-all duration-300 ${onClick ? 'cursor-pointer hover:bg-[#292929] active:scale-[0.98]' : ''} animate-in fade-in slide-in-from-bottom-4 fill-mode-both ${className}`}
     style={{ animationDelay: `${delay}ms` }}
   >
     {children}
@@ -55,7 +55,7 @@ const Card = ({ children, className = '', delay = 0, onClick }) => (
 );
 
 const ProgressBar = ({ progress, color = 'bg-red-500' }) => (
-  <div className="h-3 w-full bg-[#2a2a2a] rounded-full overflow-hidden">
+  <div className="h-3 w-full bg-[#383838] rounded-full overflow-hidden">
     <div 
       className={`h-full ${color} transition-all duration-1000 ease-out`} 
       style={{ width: `${Math.min(100, Math.max(0, progress))}%` }} 
@@ -72,7 +72,7 @@ const NeonInput = ({ label, type = "text", value, onChange, placeholder, ...inpu
       onChange={onChange}
       placeholder={placeholder}
       {...inputProps}
-      className="w-full bg-[#0a0a0a] text-white border-2 border-zinc-800 rounded-2xl px-5 py-4 focus:outline-none focus:border-red-500/80 focus:shadow-[0_0_15px_rgba(239,68,68,0.3)] transition-all placeholder:text-zinc-700 font-medium"
+      className="w-full bg-[#171717] text-white border-2 border-zinc-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-red-500/80 focus:shadow-[0_0_15px_rgba(239,68,68,0.3)] transition-all placeholder:text-zinc-500 font-medium"
     />
   </div>
 );
@@ -81,8 +81,8 @@ const ErrorScreen = ({ error, onOffline }) => {
   const isConfigError = error && error.includes('auth/configuration-not-found');
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-6" style={{fontFamily: 'Nunito, sans-serif'}}>
-      <div className="bg-[#121212] rounded-[32px] p-8 max-w-md w-full shadow-[0_0_40px_rgba(239,68,68,0.15)] text-center animate-in zoom-in-95">
+    <div className="min-h-screen bg-[#111111] text-white flex flex-col items-center justify-center p-6" style={{fontFamily: 'Nunito, sans-serif'}}>
+      <div className="bg-[#202020] rounded-[32px] p-8 max-w-md w-full shadow-[0_0_40px_rgba(239,68,68,0.15)] text-center animate-in zoom-in-95">
         <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 text-red-500">
           <AlertTriangle size={40} />
         </div>
@@ -179,7 +179,7 @@ const LoginScreen = ({ onOffline }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white flex flex-col items-center justify-center p-6 relative overflow-hidden" style={{fontFamily: 'Nunito, sans-serif'}}>
+    <div className="min-h-screen bg-[#111111] text-white flex flex-col items-center justify-center p-6 relative overflow-hidden" style={{fontFamily: 'Nunito, sans-serif'}}>
       {/* Background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-red-600/20 rounded-full blur-[120px] pointer-events-none" />
 
@@ -189,10 +189,10 @@ const LoginScreen = ({ onOffline }) => {
             <Zap size={32} className="text-white" />
           </div>
           <h1 className="text-4xl font-black tracking-tight mb-2">Equilíbrio</h1>
-          <p className="text-zinc-500 font-bold uppercase tracking-widest text-sm">Administre sua vida</p>
+          <p className="text-zinc-400 font-bold uppercase tracking-widest text-sm">Administre sua vida</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-[#121212] p-8 rounded-[32px] space-y-6">
+        <form onSubmit={handleSubmit} className="bg-[#202020] p-8 rounded-[32px] space-y-6">
           {error && <div className="bg-red-950/50 border border-red-500/50 text-red-400 p-4 rounded-2xl text-sm text-center font-bold">{error}</div>}
           
           <NeonInput label="E-mail" type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="seu@email.com" />
@@ -203,9 +203,9 @@ const LoginScreen = ({ onOffline }) => {
           </button>
           
           <div className="relative flex items-center py-2">
-            <div className="flex-grow border-t border-zinc-800"></div>
-            <span className="flex-shrink-0 mx-4 text-zinc-600 text-xs font-bold uppercase tracking-wider">ou</span>
-            <div className="flex-grow border-t border-zinc-800"></div>
+            <div className="flex-grow border-t border-zinc-700"></div>
+            <span className="flex-shrink-0 mx-4 text-zinc-500 text-xs font-bold uppercase tracking-wider">ou</span>
+            <div className="flex-grow border-t border-zinc-700"></div>
           </div>
 
           <button 
@@ -224,17 +224,17 @@ const LoginScreen = ({ onOffline }) => {
           </button>
           
           <div className="text-center pt-2">
-            <button type="button" onClick={() => setIsLogin(!isLogin)} className="text-zinc-500 hover:text-white text-sm font-bold transition-colors">
+            <button type="button" onClick={() => setIsLogin(!isLogin)} className="text-zinc-400 hover:text-white text-sm font-bold transition-colors">
               {isLogin ? 'Não tem conta? Criar agora' : 'Já tem conta? Entrar'}
             </button>
           </div>
         </form>
 
         <div className="mt-8 space-y-4">
-          <button onClick={handleGuest} disabled={loading} className="w-full bg-transparent border-2 border-zinc-800 hover:border-zinc-700 text-zinc-400 font-bold py-4 rounded-2xl transition-all active:scale-95">
+          <button onClick={handleGuest} disabled={loading} className="w-full bg-transparent border-2 border-zinc-700 hover:border-zinc-500 text-zinc-400 font-bold py-4 rounded-2xl transition-all active:scale-95">
             ENTRAR COMO VISITANTE
           </button>
-          <button onClick={onOffline} className="w-full text-zinc-600 hover:text-zinc-400 text-sm font-bold py-2 transition-all">
+          <button onClick={onOffline} className="w-full text-zinc-500 hover:text-zinc-400 text-sm font-bold py-2 transition-all">
             FORÇAR MODO OFFLINE
           </button>
         </div>
@@ -347,7 +347,7 @@ const AppProvider = ({ children }) => {
     window.location.reload();
   };
 
-  if (loading) return <div className="min-h-screen bg-black flex items-center justify-center"><div className="w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full animate-spin" /></div>;
+  if (loading) return <div className="min-h-screen bg-[#111111] flex items-center justify-center"><div className="w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full animate-spin" /></div>;
   if (authError && !offlineMode) return <ErrorScreen error={authError} onOffline={startOffline} />;
   if (!user) return <LoginScreen onOffline={startOffline} />;
 
@@ -385,15 +385,15 @@ const DashboardView = () => {
     <div className="space-y-6 pb-24">
       {/* Header / Month Selector */}
       <div className="flex items-center justify-between mb-8">
-        <button onClick={() => changeMonth(-1)} className="p-3 bg-[#121212] rounded-2xl hover:bg-zinc-800 active:scale-95 transition-all"><ChevronLeft size={24} /></button>
+        <button onClick={() => changeMonth(-1)} className="p-3 bg-[#202020] rounded-2xl hover:bg-zinc-800 active:scale-95 transition-all"><ChevronLeft size={24} /></button>
         <h2 className="text-xl font-black uppercase tracking-widest text-white capitalize">{monthStr}</h2>
-        <button onClick={() => changeMonth(1)} className="p-3 bg-[#121212] rounded-2xl hover:bg-zinc-800 active:scale-95 transition-all"><ChevronRight size={24} /></button>
+        <button onClick={() => changeMonth(1)} className="p-3 bg-[#202020] rounded-2xl hover:bg-zinc-800 active:scale-95 transition-all"><ChevronRight size={24} /></button>
       </div>
 
       {/* Main Balance Block */}
-      <Card delay={100} className="relative overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] border border-zinc-800">
+      <Card delay={100} className="relative overflow-hidden bg-gradient-to-br from-[#262626] to-[#171717] border border-zinc-700">
         <div className="relative z-10">
-          <p className="text-sm font-bold text-zinc-500 tracking-[0.2em] mb-2 uppercase">Saldo Atual</p>
+          <p className="text-sm font-bold text-zinc-400 tracking-[0.2em] mb-2 uppercase">Saldo Atual</p>
           <h1 className="text-5xl font-black text-white tracking-tight mb-6">{formatMoney(balance)}</h1>
           <div className="flex gap-4">
             <div className="bg-green-500/10 px-4 py-2 rounded-xl border border-green-500/20">
@@ -413,40 +413,40 @@ const DashboardView = () => {
         <Card delay={200}>
           <div className="flex justify-between items-end mb-4">
             <div>
-              <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Necessidades (50%)</p>
+              <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-1">Necessidades (50%)</p>
               <p className="text-2xl font-black text-white">{formatMoney(needs)}</p>
             </div>
-            <div className="text-xs font-black text-zinc-600 bg-zinc-900 px-2 py-1 rounded-lg">
+            <div className="text-xs font-black text-zinc-500 bg-zinc-800 px-2 py-1 rounded-lg">
               {incomes > 0 ? Math.round((needs/incomes)*100) : 0}%
             </div>
           </div>
-          <ProgressBar progress={incomes > 0 ? (needs/(incomes*0.5))*100 : 0} color="bg-blue-500" />
+          <ProgressBar progress={incomes > 0 ? (needs/(incomes*0.5))*100 : 0} color="bg-zinc-100" />
         </Card>
 
         <Card delay={300}>
           <div className="flex justify-between items-end mb-4">
             <div>
-              <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Desejos (30%)</p>
+              <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-1">Desejos (30%)</p>
               <p className="text-2xl font-black text-white">{formatMoney(wants)}</p>
             </div>
-            <div className="text-xs font-black text-zinc-600 bg-zinc-900 px-2 py-1 rounded-lg">
+            <div className="text-xs font-black text-zinc-500 bg-zinc-800 px-2 py-1 rounded-lg">
               {incomes > 0 ? Math.round((wants/incomes)*100) : 0}%
             </div>
           </div>
-          <ProgressBar progress={incomes > 0 ? (wants/(incomes*0.3))*100 : 0} color="bg-yellow-500" />
+          <ProgressBar progress={incomes > 0 ? (wants/(incomes*0.3))*100 : 0} color="bg-red-400" />
         </Card>
 
         <Card delay={400}>
           <div className="flex justify-between items-end mb-4">
             <div>
-              <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Futuro (20%)</p>
+              <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-1">Futuro (20%)</p>
               <p className="text-2xl font-black text-white">{formatMoney(future)}</p>
             </div>
-            <div className="text-xs font-black text-zinc-600 bg-zinc-900 px-2 py-1 rounded-lg">
+            <div className="text-xs font-black text-zinc-500 bg-zinc-800 px-2 py-1 rounded-lg">
               {incomes > 0 ? Math.round((future/incomes)*100) : 0}%
             </div>
           </div>
-          <ProgressBar progress={incomes > 0 ? (future/(incomes*0.2))*100 : 0} color="bg-green-500" />
+          <ProgressBar progress={incomes > 0 ? (future/(incomes*0.2))*100 : 0} color="bg-red-700" />
         </Card>
       </div>
     </div>
@@ -499,16 +499,16 @@ const FinancesView = () => {
         <Card className="border border-red-500/30 shadow-[0_0_30px_rgba(239,68,68,0.1)] mb-8">
           <form onSubmit={handleSave} className="space-y-4">
             {saveError && <p role="alert" className="text-sm text-red-400">{saveError}</p>}
-            <div className="flex gap-2 p-1 bg-black rounded-2xl mb-4">
-              <button type="button" onClick={()=>setForm({...form, type:'expense'})} className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all ${form.type === 'expense' ? 'bg-red-600 text-white' : 'text-zinc-500'}`}>SAÍDA</button>
-              <button type="button" onClick={()=>setForm({...form, type:'income'})} className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all ${form.type === 'income' ? 'bg-green-600 text-white' : 'text-zinc-500'}`}>ENTRADA</button>
+            <div className="flex gap-2 p-1 bg-[#171717] rounded-2xl mb-4">
+              <button type="button" onClick={()=>setForm({...form, type:'expense'})} className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all ${form.type === 'expense' ? 'bg-red-600 text-white' : 'text-zinc-400'}`}>SAÍDA</button>
+              <button type="button" onClick={()=>setForm({...form, type:'income'})} className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all ${form.type === 'income' ? 'bg-green-600 text-white' : 'text-zinc-400'}`}>ENTRADA</button>
             </div>
             
             <NeonInput type="number" min="0.01" step="0.01" placeholder="0.00" value={form.amount} onChange={e=>setForm({...form, amount:e.target.value})} />
             <NeonInput placeholder="Descrição (ex: Mercado)" value={form.desc} onChange={e=>setForm({...form, desc:e.target.value})} />
             
             {form.type === 'expense' && (
-              <select value={form.category} onChange={e=>setForm({...form, category:e.target.value})} className="w-full bg-[#0a0a0a] text-white border-2 border-zinc-800 rounded-2xl px-5 py-4 focus:outline-none focus:border-red-500 font-bold appearance-none">
+              <select value={form.category} onChange={e=>setForm({...form, category:e.target.value})} className="w-full bg-[#171717] text-white border-2 border-zinc-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-red-500 font-bold appearance-none">
                 <option value="needs">Necessidade (50%)</option>
                 <option value="wants">Desejo (30%)</option>
                 <option value="future">Futuro (20%)</option>
@@ -525,23 +525,23 @@ const FinancesView = () => {
 
       <div className="space-y-3">
         {monthTx.length === 0 ? (
-          <div className="text-center py-12 text-zinc-600 font-bold uppercase tracking-widest text-sm">Nenhuma transação neste mês</div>
+          <div className="text-center py-12 text-zinc-500 font-bold uppercase tracking-widest text-sm">Nenhuma transação neste mês</div>
         ) : monthTx.map(tx => (
-          <div key={tx.id} className="bg-[#121212] p-5 rounded-[24px] flex justify-between items-center group">
+          <div key={tx.id} className="bg-[#202020] p-5 rounded-[24px] flex justify-between items-center group">
             <div className="flex items-center gap-4">
               <div className={`w-12 h-12 rounded-full flex items-center justify-center ${tx.type === 'income' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
                 {tx.type === 'income' ? <TrendingUp size={20} /> : <Wallet size={20} />}
               </div>
               <div>
                 <p className="font-bold text-white text-lg">{tx.desc}</p>
-                <p className="text-xs font-bold text-zinc-600 uppercase tracking-widest">{new Date(tx.date + 'T12:00:00').toLocaleDateString('pt-BR')} • {tx.type === 'expense' ? tx.category : 'Receita'}</p>
+                <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{new Date(tx.date + 'T12:00:00').toLocaleDateString('pt-BR')} • {tx.type === 'expense' ? tx.category : 'Receita'}</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
               <p className={`font-black text-lg ${tx.type === 'income' ? 'text-green-500' : 'text-white'}`}>
                 {tx.type === 'income' ? '+' : '-'}{tx.amount.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}
               </p>
-              <button onClick={() => deleteTransaction(tx.id)} className="text-zinc-700 hover:text-red-500 p-2 md:opacity-0 md:group-hover:opacity-100 transition-all">
+              <button onClick={() => deleteTransaction(tx.id)} className="text-zinc-500 hover:text-red-500 p-2 md:opacity-0 md:group-hover:opacity-100 transition-all">
                 <LogOut size={16} />
               </button>
             </div>
@@ -567,7 +567,7 @@ const EvolutionView = () => {
     <div className="space-y-6 pb-24">
       <div className="mb-8">
         <h2 className="text-3xl font-black tracking-tight mb-2">Hábitos</h2>
-        <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest">Sua disciplina diária</p>
+        <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Sua disciplina diária</p>
       </div>
 
       <form onSubmit={handleAdd} className="flex gap-2">
@@ -589,17 +589,17 @@ const EvolutionView = () => {
               className={`p-6 rounded-[32px] border-2 cursor-pointer transition-all duration-300 active:scale-95 flex items-center justify-between ${
                 isDoneToday 
                   ? 'bg-red-600 border-red-500 shadow-[0_0_30px_rgba(220,38,38,0.3)]' 
-                  : 'bg-[#121212] border-zinc-800 hover:border-zinc-700'
+                  : 'bg-[#202020] border-zinc-700 hover:border-zinc-500'
               }`}
             >
               <div>
                 <h3 className={`font-black text-xl mb-1 ${isDoneToday ? 'text-white' : 'text-zinc-300'}`}>{habit.name}</h3>
-                <p className={`text-xs font-bold uppercase tracking-widest ${isDoneToday ? 'text-red-200' : 'text-zinc-600'}`}>
+                <p className={`text-xs font-bold uppercase tracking-widest ${isDoneToday ? 'text-red-200' : 'text-zinc-500'}`}>
                   {habit.logs.length} dias concluídos
                 </p>
               </div>
               <div>
-                {isDoneToday ? <CheckCircle2 size={32} className="text-white" /> : <Circle size={32} className="text-zinc-700" />}
+                {isDoneToday ? <CheckCircle2 size={32} className="text-white" /> : <Circle size={32} className="text-zinc-500" />}
               </div>
             </div>
           );
@@ -634,13 +634,13 @@ const ProfileView = () => {
     <div className="space-y-6 pb-24">
       <Card>
         <div className="flex items-center gap-6 mb-8">
-          <div className="w-20 h-20 bg-zinc-900 rounded-full flex items-center justify-center border border-zinc-800 relative">
-            <User size={32} className="text-zinc-500" />
+          <div className="w-20 h-20 bg-zinc-800 rounded-full flex items-center justify-center border border-zinc-700 relative">
+            <User size={32} className="text-zinc-400" />
             {offlineMode && <div className="absolute -bottom-2 -right-2 bg-red-600 text-white text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-wider">OFFLINE</div>}
           </div>
           <div>
             <h2 className="text-3xl font-black text-white">Meu Perfil</h2>
-            <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest mt-1">
+            <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest mt-1">
               ID: {user?.uid?.slice(0, 8)}
             </p>
           </div>
@@ -655,7 +655,7 @@ const ProfileView = () => {
             <button type="submit" disabled={saving} className="w-full bg-white text-black hover:bg-zinc-200 font-black py-4 rounded-2xl transition-all active:scale-95 disabled:opacity-50">
               {saving ? 'SALVANDO...' : saved ? 'DADOS SALVOS ✓' : 'SALVAR ALTERAÇÕES'}
             </button>
-            <button type="button" onClick={handleLogout} className="w-full bg-transparent border-2 border-zinc-800 text-zinc-400 hover:text-red-500 hover:border-red-900/50 font-black py-4 rounded-2xl transition-all active:scale-95">
+            <button type="button" onClick={handleLogout} className="w-full bg-transparent border-2 border-zinc-700 text-zinc-400 hover:text-red-500 hover:border-red-900/50 font-black py-4 rounded-2xl transition-all active:scale-95">
               DESLOGAR (SAIR)
             </button>
           </div>
@@ -663,7 +663,7 @@ const ProfileView = () => {
       </Card>
       
       {!offlineMode && (
-        <p className="text-center text-xs font-bold text-zinc-600 uppercase tracking-widest">
+        <p className="text-center text-xs font-bold text-zinc-500 uppercase tracking-widest">
           Sincronizado na Nuvem • {firebaseConfig.projectId}
         </p>
       )}
@@ -676,7 +676,7 @@ export default function App() {
 
   return (
     <AppProvider>
-      <div className="min-h-screen bg-[#050505] text-white selection:bg-red-500/30 font-sans" style={{fontFamily: 'Nunito, sans-serif'}}>
+      <div className="min-h-screen bg-[#111111] text-white selection:bg-red-500/30 font-sans" style={{fontFamily: 'Nunito, sans-serif'}}>
         {/* Main Content Area */}
         <main className="max-w-2xl mx-auto p-6 pt-12">
           {activeTab === 'dashboard' && <DashboardView />}
@@ -687,7 +687,7 @@ export default function App() {
 
         {/* Floating Bottom Navigation (Bento Style) */}
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-[calc(100%-3rem)] md:max-w-md z-50">
-          <nav className="bg-[#121212]/90 backdrop-blur-xl border border-zinc-800/50 p-2 rounded-full flex justify-between items-center shadow-[0_20px_40px_rgba(0,0,0,0.8)]">
+          <nav className="bg-[#202020]/90 backdrop-blur-xl border border-zinc-700/50 p-2 rounded-full flex justify-between items-center shadow-[0_20px_40px_rgba(0,0,0,0.8)]">
             {[
               { id: 'dashboard', icon: Home, label: 'Início' },
               { id: 'finances', icon: Wallet, label: 'Caixa' },
@@ -700,7 +700,7 @@ export default function App() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`relative flex items-center justify-center w-14 h-14 rounded-full transition-all duration-300 ${isActive ? 'bg-white text-black scale-100' : 'text-zinc-500 hover:text-white hover:bg-zinc-800/50 scale-95'}`}
+                  className={`relative flex items-center justify-center w-14 h-14 rounded-full transition-all duration-300 ${isActive ? 'bg-white text-black scale-100' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50 scale-95'}`}
                   aria-label={tab.label}
                 >
                   <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />

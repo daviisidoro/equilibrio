@@ -2,7 +2,9 @@ import React, { useState, useEffect, createContext, useContext } from 'react';
 import { 
   Home, Wallet, TrendingUp, User, Plus, 
   ChevronLeft, ChevronRight, LogOut, CheckCircle2, 
-  Circle, Activity, Zap, AlertTriangle
+  Circle, Activity, Zap, AlertTriangle,
+  ArrowUpRight, ArrowDownRight, ArrowRight, Sparkles,
+  CalendarDays, ReceiptText
 } from 'lucide-react';
 import { initializeApp } from "firebase/app";
 import { 
@@ -47,7 +49,7 @@ const monthKey = (date) => dateKey(date).slice(0, 7);
 const Card = ({ children, className = '', delay = 0, onClick }) => (
   <div 
     onClick={onClick}
-    className={`bg-[#121212] rounded-[32px] p-6 transition-all duration-300 ${onClick ? 'cursor-pointer hover:bg-[#1a1a1a] active:scale-[0.98]' : ''} animate-in fade-in slide-in-from-bottom-4 fill-mode-both ${className}`}
+    className={`surface-card ${onClick ? 'surface-card--interactive' : ''} ${className}`}
     style={{ animationDelay: `${delay}ms` }}
   >
     {children}
@@ -55,9 +57,9 @@ const Card = ({ children, className = '', delay = 0, onClick }) => (
 );
 
 const ProgressBar = ({ progress, color = 'bg-red-500' }) => (
-  <div className="h-3 w-full bg-[#2a2a2a] rounded-full overflow-hidden">
+  <div className="progress-track">
     <div 
-      className={`h-full ${color} transition-all duration-1000 ease-out`} 
+      className={`progress-fill ${color}`}
       style={{ width: `${Math.min(100, Math.max(0, progress))}%` }} 
     />
   </div>
@@ -65,14 +67,14 @@ const ProgressBar = ({ progress, color = 'bg-red-500' }) => (
 
 const NeonInput = ({ label, type = "text", value, onChange, placeholder, ...inputProps }) => (
   <div className="flex flex-col gap-2">
-    {label && <label className="text-sm font-bold text-zinc-400 uppercase tracking-wider">{label}</label>}
+    {label && <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{label}</label>}
     <input 
       type={type}
       value={value}
       onChange={onChange}
       placeholder={placeholder}
       {...inputProps}
-      className="w-full bg-[#0a0a0a] text-white border-2 border-zinc-800 rounded-2xl px-5 py-4 focus:outline-none focus:border-red-500/80 focus:shadow-[0_0_15px_rgba(239,68,68,0.3)] transition-all placeholder:text-zinc-700 font-medium"
+      className="form-input"
     />
   </div>
 );
@@ -81,8 +83,8 @@ const ErrorScreen = ({ error, onOffline }) => {
   const isConfigError = error && error.includes('auth/configuration-not-found');
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-6" style={{fontFamily: 'Nunito, sans-serif'}}>
-      <div className="bg-[#121212] rounded-[32px] p-8 max-w-md w-full shadow-[0_0_40px_rgba(239,68,68,0.15)] text-center animate-in zoom-in-95">
+    <div className="auth-shell min-h-screen text-white flex flex-col items-center justify-center p-6">
+      <div className="auth-card bg-[#121212] rounded-[32px] p-8 max-w-md w-full shadow-[0_0_40px_rgba(239,68,68,0.15)] text-center animate-in zoom-in-95">
         <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 text-red-500">
           <AlertTriangle size={40} />
         </div>
@@ -179,20 +181,18 @@ const LoginScreen = ({ onOffline }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white flex flex-col items-center justify-center p-6 relative overflow-hidden" style={{fontFamily: 'Nunito, sans-serif'}}>
+    <div className="auth-shell min-h-screen text-white flex flex-col items-center justify-center p-6 relative overflow-hidden">
       {/* Background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-red-600/20 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="w-full max-w-md relative z-10 animate-in fade-in slide-in-from-bottom-8">
         <div className="text-center mb-10">
-          <div className="w-16 h-16 bg-red-600 rounded-3xl mx-auto flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(220,38,38,0.4)]">
-            <Zap size={32} className="text-white" />
-          </div>
+          <div className="brand-symbol auth-brand mx-auto mb-6" aria-hidden="true"><span /></div>
           <h1 className="text-4xl font-black tracking-tight mb-2">Equilíbrio</h1>
           <p className="text-zinc-500 font-bold uppercase tracking-widest text-sm">Administre sua vida</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-[#121212] p-8 rounded-[32px] space-y-6">
+        <form onSubmit={handleSubmit} className="auth-card bg-[#121212] p-8 rounded-[32px] space-y-6">
           {error && <div className="bg-red-950/50 border border-red-500/50 text-red-400 p-4 rounded-2xl text-sm text-center font-bold">{error}</div>}
           
           <NeonInput label="E-mail" type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="seu@email.com" />
@@ -363,90 +363,126 @@ const AppProvider = ({ children }) => {
   );
 };
 
-const DashboardView = () => {
-  const { transactions, selectedDate, changeMonth } = useContext(AppContext);
-  const monthStr = selectedDate.toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+const DashboardView = ({ onNavigate }) => {
+  const { transactions, habits, selectedDate, changeMonth } = useContext(AppContext);
+  const monthName = selectedDate.toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+  const monthStr = monthName.charAt(0).toUpperCase() + monthName.slice(1);
   const filterMonth = monthKey(selectedDate);
-
-  const monthTx = transactions.filter(t => t.date.startsWith(filterMonth));
-  const incomes = monthTx.filter(t => t.type === 'income').reduce((a, b) => a + b.amount, 0);
+  const monthTx = transactions.filter(t => t.date?.startsWith(filterMonth));
+  const incomes = monthTx.filter(t => t.type === 'income').reduce((sum, tx) => sum + tx.amount, 0);
   const expenses = monthTx.filter(t => t.type === 'expense');
-  const totalExpenses = expenses.reduce((a, b) => a + b.amount, 0);
-  
+  const totalExpenses = expenses.reduce((sum, tx) => sum + tx.amount, 0);
   const balance = incomes - totalExpenses;
-  
-  const needs = expenses.filter(t => t.category === 'needs').reduce((a, b) => a + b.amount, 0);
-  const wants = expenses.filter(t => t.category === 'wants').reduce((a, b) => a + b.amount, 0);
-  const future = expenses.filter(t => t.category === 'future').reduce((a, b) => a + b.amount, 0);
-
-  const formatMoney = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const formatMoney = value => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const budget = [
+    { label: 'Necessidades', rule: '50%', category: 'needs', target: 0.5, color: 'bg-red-500' },
+    { label: 'Desejos', rule: '30%', category: 'wants', target: 0.3, color: 'bg-white' },
+    { label: 'Futuro', rule: '20%', category: 'future', target: 0.2, color: 'bg-red-300' },
+  ].map(item => ({
+    ...item,
+    amount: expenses.filter(tx => tx.category === item.category).reduce((sum, tx) => sum + tx.amount, 0),
+  }));
+  const recent = [...monthTx].sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 3);
+  const completedToday = habits.filter(habit => habit.logs?.includes(dateKey())).length;
+  const habitPercent = habits.length ? Math.round(completedToday / habits.length * 100) : 0;
 
   return (
-    <div className="space-y-6 pb-24">
-      {/* Header / Month Selector */}
-      <div className="flex items-center justify-between mb-8">
-        <button onClick={() => changeMonth(-1)} className="p-3 bg-[#121212] rounded-2xl hover:bg-zinc-800 active:scale-95 transition-all"><ChevronLeft size={24} /></button>
-        <h2 className="text-xl font-black uppercase tracking-widest text-white capitalize">{monthStr}</h2>
-        <button onClick={() => changeMonth(1)} className="p-3 bg-[#121212] rounded-2xl hover:bg-zinc-800 active:scale-95 transition-all"><ChevronRight size={24} /></button>
+    <div className="view-stack">
+      <header className="dashboard-intro">
+        <div className="brand-symbol" aria-hidden="true"><span /></div>
+        <div>
+          <p className="eyebrow">EQUILÍBRIO <span className="eyebrow-dot" /> VISÃO GERAL</p>
+          <h1>Seu mês <span>em foco.</span></h1>
+          <p className="intro-copy">Clareza para suas escolhas, todos os dias.</p>
+        </div>
+      </header>
+
+      <div className="month-switcher">
+        <button type="button" onClick={() => changeMonth(-1)} aria-label="Mês anterior"><ChevronLeft size={20} /></button>
+        <div><CalendarDays size={16} /><span>{monthStr}</span></div>
+        <button type="button" onClick={() => changeMonth(1)} aria-label="Próximo mês"><ChevronRight size={20} /></button>
       </div>
 
-      {/* Main Balance Block */}
-      <Card delay={100} className="relative overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] border border-zinc-800">
-        <div className="relative z-10">
-          <p className="text-sm font-bold text-zinc-500 tracking-[0.2em] mb-2 uppercase">Saldo Atual</p>
-          <h1 className="text-5xl font-black text-white tracking-tight mb-6">{formatMoney(balance)}</h1>
-          <div className="flex gap-4">
-            <div className="bg-green-500/10 px-4 py-2 rounded-xl border border-green-500/20">
-              <span className="text-xs font-bold text-green-500 uppercase tracking-wider block mb-1">Entradas</span>
-              <span className="text-sm font-black text-white">{formatMoney(incomes)}</span>
-            </div>
-            <div className="bg-red-500/10 px-4 py-2 rounded-xl border border-red-500/20">
-              <span className="text-xs font-bold text-red-500 uppercase tracking-wider block mb-1">Saídas</span>
-              <span className="text-sm font-black text-white">{formatMoney(totalExpenses)}</span>
-            </div>
-          </div>
+      <Card className="hero-card" delay={70}>
+        <div className="hero-orbit" aria-hidden="true" />
+        <div className="hero-topline"><span>01 / PAINEL FINANCEIRO</span><Sparkles size={18} /></div>
+        <p className="hero-label">Saldo do mês</p>
+        <h2 className="hero-amount">{formatMoney(balance)}</h2>
+        <p className="hero-caption">Entradas menos saídas neste período</p>
+        <div className="hero-bottomline">
+          <span><Activity size={16} /> Seu panorama em tempo real</span>
+          <button type="button" onClick={() => onNavigate('finances')}>Novo registro <ArrowUpRight size={16} /></button>
         </div>
       </Card>
 
-      {/* 50/30/20 Rule Blocks */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card delay={200}>
-          <div className="flex justify-between items-end mb-4">
-            <div>
-              <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Necessidades (50%)</p>
-              <p className="text-2xl font-black text-white">{formatMoney(needs)}</p>
-            </div>
-            <div className="text-xs font-black text-zinc-600 bg-zinc-900 px-2 py-1 rounded-lg">
-              {incomes > 0 ? Math.round((needs/incomes)*100) : 0}%
-            </div>
+      <div className="metric-grid">
+        <Card className="metric-card metric-card--income" delay={120}>
+          <div className="metric-icon"><ArrowDownRight size={20} /></div>
+          <span>Entradas</span>
+          <strong>{formatMoney(incomes)}</strong>
+          <small>{monthTx.filter(tx => tx.type === 'income').length} registros no mês</small>
+        </Card>
+        <Card className="metric-card metric-card--expense" delay={170}>
+          <div className="metric-icon"><ArrowUpRight size={20} /></div>
+          <span>Saídas</span>
+          <strong>{formatMoney(totalExpenses)}</strong>
+          <small>{expenses.length} registros no mês</small>
+        </Card>
+      </div>
+
+      <Card className="budget-card" delay={220}>
+        <div className="section-heading">
+          <div><p className="eyebrow">PLANEJAMENTO</p><h2>Regra 50 / 30 / 20</h2></div>
+          <span className="section-badge">DO MÊS</span>
+        </div>
+        <p className="section-description">Veja como cada categoria ocupa sua receita.</p>
+        <div className="budget-list">
+          {budget.map(item => {
+            const revenueShare = incomes ? Math.round(item.amount / incomes * 100) : null;
+            const targetUse = incomes ? item.amount / (incomes * item.target) * 100 : 0;
+            return (
+              <div className="budget-row" key={item.category}>
+                <div className="budget-row-top">
+                  <div><span className={`budget-dot budget-dot--${item.category}`} /><span>{item.label}</span><small>{item.rule}</small></div>
+                  <strong>{formatMoney(item.amount)}</strong>
+                </div>
+                <ProgressBar progress={targetUse} color={item.color} />
+                <p>{revenueShare === null ? 'Adicione uma entrada para calcular' : `${revenueShare}% da receita utilizada`}</p>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+
+      <div className="dashboard-grid">
+        <Card className="activity-card" delay={270}>
+          <div className="section-heading">
+            <div><p className="eyebrow">MOVIMENTO</p><h2>Últimos registros</h2></div>
+            <ReceiptText size={20} />
           </div>
-          <ProgressBar progress={incomes > 0 ? (needs/(incomes*0.5))*100 : 0} color="bg-blue-500" />
+          {recent.length ? (
+            <div className="recent-list">
+              {recent.map(tx => (
+                <div className="recent-row" key={tx.id}>
+                  <span className={tx.type === 'income' ? 'recent-icon recent-icon--income' : 'recent-icon'}>{tx.type === 'income' ? <ArrowDownRight size={18} /> : <ArrowUpRight size={18} />}</span>
+                  <div><strong>{tx.desc}</strong><small>{new Date(`${tx.date}T12:00:00`).toLocaleDateString('pt-BR')}</small></div>
+                  <b>{tx.type === 'income' ? '+' : '-'}{formatMoney(tx.amount)}</b>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="soft-empty"><ReceiptText size={24} /><p>Seus registros vão aparecer aqui.</p></div>
+          )}
+          <button type="button" className="text-action" onClick={() => onNavigate('finances')}>Abrir caixa <ArrowRight size={17} /></button>
         </Card>
 
-        <Card delay={300}>
-          <div className="flex justify-between items-end mb-4">
-            <div>
-              <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Desejos (30%)</p>
-              <p className="text-2xl font-black text-white">{formatMoney(wants)}</p>
-            </div>
-            <div className="text-xs font-black text-zinc-600 bg-zinc-900 px-2 py-1 rounded-lg">
-              {incomes > 0 ? Math.round((wants/incomes)*100) : 0}%
-            </div>
+        <Card className="habit-teaser" delay={320}>
+          <div className="section-heading"><div><p className="eyebrow">CONSTÂNCIA</p><h2>Hábitos de hoje</h2></div><Zap size={20} /></div>
+          <div className="habit-teaser-main">
+            <div><strong>{completedToday}<span> / {habits.length}</span></strong><p>{habits.length ? 'hábitos concluídos hoje' : 'Seu próximo passo começa aqui'}</p></div>
+            <div className="habit-ring" style={{ '--habit-progress': `${habitPercent}%` }}><span>{habitPercent}%</span></div>
           </div>
-          <ProgressBar progress={incomes > 0 ? (wants/(incomes*0.3))*100 : 0} color="bg-yellow-500" />
-        </Card>
-
-        <Card delay={400}>
-          <div className="flex justify-between items-end mb-4">
-            <div>
-              <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Futuro (20%)</p>
-              <p className="text-2xl font-black text-white">{formatMoney(future)}</p>
-            </div>
-            <div className="text-xs font-black text-zinc-600 bg-zinc-900 px-2 py-1 rounded-lg">
-              {incomes > 0 ? Math.round((future/incomes)*100) : 0}%
-            </div>
-          </div>
-          <ProgressBar progress={incomes > 0 ? (future/(incomes*0.2))*100 : 0} color="bg-green-500" />
+          <button type="button" className="text-action" onClick={() => onNavigate('evolution')}>Ver hábitos <ArrowRight size={17} /></button>
         </Card>
       </div>
     </div>
@@ -461,7 +497,11 @@ const FinancesView = () => {
   const [saving, setSaving] = useState(false);
 
   const filterMonth = monthKey(selectedDate);
-  const monthTx = transactions.filter(t => t.date.startsWith(filterMonth)).sort((a,b) => new Date(b.date) - new Date(a.date));
+  const monthTx = transactions.filter(t => t.date?.startsWith(filterMonth)).sort((a,b) => new Date(b.date) - new Date(a.date));
+  const incomeTotal = monthTx.filter(tx => tx.type === 'income').reduce((sum, tx) => sum + tx.amount, 0);
+  const expenseTotal = monthTx.filter(tx => tx.type === 'expense').reduce((sum, tx) => sum + tx.amount, 0);
+  const formatMoney = value => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const categoryLabels = { needs: 'Necessidade', wants: 'Desejo', future: 'Futuro' };
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -484,24 +524,36 @@ const FinancesView = () => {
   };
 
   return (
-    <div className="space-y-6 pb-24 relative min-h-[80vh]">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-black tracking-tight">Transações</h2>
+    <div className="view-stack">
+      <div className="page-header">
+        <div><p className="eyebrow">SEU DINHEIRO, COM CLAREZA</p><h1>Caixa<span>.</span></h1><p>Todos os movimentos do seu mês, em um só lugar.</p></div>
         <button 
           onClick={() => setShowForm(!showForm)}
-          className={`w-12 h-12 rounded-full flex items-center justify-center transition-all shadow-lg ${showForm ? 'bg-zinc-800 text-white rotate-45' : 'bg-red-600 text-white hover:bg-red-500 shadow-red-600/30 active:scale-95'}`}
+          className={`round-add ${showForm ? 'round-add--open' : ''}`}
+          aria-label={showForm ? 'Fechar formulário' : 'Adicionar transação'}
         >
           <Plus size={24} />
         </button>
       </div>
 
+      <Card className="finance-summary" delay={70}>
+        <div className="finance-summary-top"><span>RESUMO DO MÊS</span><Wallet size={18} /></div>
+        <p>Saldo do período</p>
+        <strong>{formatMoney(incomeTotal - expenseTotal)}</strong>
+        <div className="finance-summary-grid">
+          <div><ArrowDownRight size={17} /><span>Entradas</span><b>{formatMoney(incomeTotal)}</b></div>
+          <div><ArrowUpRight size={17} /><span>Saídas</span><b>{formatMoney(expenseTotal)}</b></div>
+        </div>
+      </Card>
+
       {showForm && (
-        <Card className="border border-red-500/30 shadow-[0_0_30px_rgba(239,68,68,0.1)] mb-8">
+        <Card className="form-card">
           <form onSubmit={handleSave} className="space-y-4">
+            <div><p className="eyebrow">NOVO MOVIMENTO</p><h2 className="form-title">Adicionar registro</h2></div>
             {saveError && <p role="alert" className="text-sm text-red-400">{saveError}</p>}
             <div className="flex gap-2 p-1 bg-black rounded-2xl mb-4">
               <button type="button" onClick={()=>setForm({...form, type:'expense'})} className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all ${form.type === 'expense' ? 'bg-red-600 text-white' : 'text-zinc-500'}`}>SAÍDA</button>
-              <button type="button" onClick={()=>setForm({...form, type:'income'})} className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all ${form.type === 'income' ? 'bg-green-600 text-white' : 'text-zinc-500'}`}>ENTRADA</button>
+              <button type="button" onClick={()=>setForm({...form, type:'income'})} className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all ${form.type === 'income' ? 'bg-white text-black' : 'text-zinc-500'}`}>ENTRADA</button>
             </div>
             
             <NeonInput type="number" min="0.01" step="0.01" placeholder="0.00" value={form.amount} onChange={e=>setForm({...form, amount:e.target.value})} />
@@ -523,25 +575,31 @@ const FinancesView = () => {
         </Card>
       )}
 
-      <div className="space-y-3">
+      <div className="transaction-list">
         {monthTx.length === 0 ? (
-          <div className="text-center py-12 text-zinc-600 font-bold uppercase tracking-widest text-sm">Nenhuma transação neste mês</div>
+          <Card className="empty-state" delay={130}>
+            <div className="empty-state-icon"><ReceiptText size={27} /></div>
+            <p className="eyebrow">SEU HISTÓRICO COMEÇA AQUI</p>
+            <h2>Nenhuma transação ainda</h2>
+            <p>Adicione uma entrada ou saída para ver seu mês ganhar forma.</p>
+            <button type="button" onClick={() => setShowForm(true)}>Adicionar registro <ArrowRight size={17} /></button>
+          </Card>
         ) : monthTx.map(tx => (
-          <div key={tx.id} className="bg-[#121212] p-5 rounded-[24px] flex justify-between items-center group">
+          <div key={tx.id} className="surface-card transaction-card group">
             <div className="flex items-center gap-4">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${tx.type === 'income' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+              <div className={`transaction-icon ${tx.type === 'income' ? 'transaction-icon--income' : ''}`}>
                 {tx.type === 'income' ? <TrendingUp size={20} /> : <Wallet size={20} />}
               </div>
               <div>
                 <p className="font-bold text-white text-lg">{tx.desc}</p>
-                <p className="text-xs font-bold text-zinc-600 uppercase tracking-widest">{new Date(tx.date + 'T12:00:00').toLocaleDateString('pt-BR')} • {tx.type === 'expense' ? tx.category : 'Receita'}</p>
+                <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{new Date(tx.date + 'T12:00:00').toLocaleDateString('pt-BR')} • {tx.type === 'expense' ? categoryLabels[tx.category] || 'Despesa' : 'Receita'}</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <p className={`font-black text-lg ${tx.type === 'income' ? 'text-green-500' : 'text-white'}`}>
+              <p className="font-black text-lg text-white">
                 {tx.type === 'income' ? '+' : '-'}{tx.amount.toLocaleString('pt-BR', {style:'currency', currency:'BRL'})}
               </p>
-              <button onClick={() => deleteTransaction(tx.id)} className="text-zinc-700 hover:text-red-500 p-2 md:opacity-0 md:group-hover:opacity-100 transition-all">
+              <button onClick={() => deleteTransaction(tx.id)} aria-label={`Excluir ${tx.desc}`} className="text-zinc-500 hover:text-red-400 p-2 md:opacity-0 md:group-hover:opacity-100 transition-all">
                 <LogOut size={16} />
               </button>
             </div>
@@ -555,53 +613,79 @@ const FinancesView = () => {
 const EvolutionView = () => {
   const { habits, addHabit, toggleHabit } = useContext(AppContext);
   const [newHabit, setNewHabit] = useState('');
+  const [habitError, setHabitError] = useState('');
+  const [savingHabit, setSavingHabit] = useState(false);
   
   const todayStr = dateKey();
+  const completedToday = habits.filter(habit => habit.logs?.includes(todayStr)).length;
+  const progress = habits.length ? completedToday / habits.length * 100 : 0;
 
-  const handleAdd = (e) => {
+  const handleAdd = async (e) => {
     e.preventDefault();
-    if(newHabit.trim()) { addHabit(newHabit); setNewHabit(''); }
+    if (!newHabit.trim()) return;
+    setSavingHabit(true);
+    setHabitError('');
+    try {
+      await addHabit(newHabit.trim());
+      setNewHabit('');
+    } catch (error) {
+      setHabitError(error.message || 'Não foi possível criar o hábito.');
+    } finally {
+      setSavingHabit(false);
+    }
   };
 
   return (
-    <div className="space-y-6 pb-24">
-      <div className="mb-8">
-        <h2 className="text-3xl font-black tracking-tight mb-2">Hábitos</h2>
-        <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest">Sua disciplina diária</p>
+    <div className="view-stack">
+      <div className="page-header">
+        <div><p className="eyebrow">PEQUENOS PASSOS, GRANDES MUDANÇAS</p><h1>Hábitos<span>.</span></h1><p>Transforme constância em progresso.</p></div>
       </div>
 
-      <form onSubmit={handleAdd} className="flex gap-2">
+      <Card className="habit-summary" delay={70}>
+        <div className="habit-summary-top"><div><p className="eyebrow">SEU RITMO</p><h2>Hoje é dia de continuar.</h2></div><Zap size={21} /></div>
+        <div className="habit-summary-count"><strong>{completedToday}<span> / {habits.length}</span></strong><p>concluídos hoje</p></div>
+        <ProgressBar progress={progress} color="bg-red-500" />
+        <small>{progress === 100 && habits.length ? 'Você completou todos os hábitos de hoje.' : 'Cada marcação conta para a sua sequência.'}</small>
+      </Card>
+
+      <form onSubmit={handleAdd} className="habit-form">
         <div className="flex-1">
-          <NeonInput placeholder="Novo hábito..." value={newHabit} onChange={e=>setNewHabit(e.target.value)} />
+          <NeonInput placeholder="Nome do novo hábito..." value={newHabit} onChange={e=>setNewHabit(e.target.value)} aria-label="Nome do novo hábito" />
         </div>
-        <button type="submit" className="bg-red-600 text-white w-14 rounded-2xl flex items-center justify-center hover:bg-red-500 active:scale-95 transition-all">
+        <button type="submit" disabled={savingHabit} aria-label="Adicionar hábito" className="round-add disabled:opacity-50">
           <Plus size={24} />
         </button>
       </form>
+      {habitError && <p role="alert" className="text-sm text-red-400">{habitError}</p>}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
+      <div className="habit-list">
+        {habits.length === 0 && (
+          <Card className="empty-state" delay={130}>
+            <div className="empty-state-icon"><Sparkles size={27} /></div>
+            <p className="eyebrow">COMECE NO SEU TEMPO</p>
+            <h2>Seu primeiro hábito espera por você</h2>
+            <p>Escreva algo simples acima, como ler, caminhar ou beber água.</p>
+          </Card>
+        )}
         {habits.map(habit => {
           const isDoneToday = habit.logs.includes(todayStr);
           return (
-            <div 
+            <button type="button"
               key={habit.id} 
               onClick={() => toggleHabit(habit.id, todayStr, habit.logs)}
-              className={`p-6 rounded-[32px] border-2 cursor-pointer transition-all duration-300 active:scale-95 flex items-center justify-between ${
-                isDoneToday 
-                  ? 'bg-red-600 border-red-500 shadow-[0_0_30px_rgba(220,38,38,0.3)]' 
-                  : 'bg-[#121212] border-zinc-800 hover:border-zinc-700'
-              }`}
+              aria-pressed={isDoneToday}
+              className={`habit-card ${isDoneToday ? 'habit-card--done' : ''}`}
             >
               <div>
-                <h3 className={`font-black text-xl mb-1 ${isDoneToday ? 'text-white' : 'text-zinc-300'}`}>{habit.name}</h3>
-                <p className={`text-xs font-bold uppercase tracking-widest ${isDoneToday ? 'text-red-200' : 'text-zinc-600'}`}>
-                  {habit.logs.length} dias concluídos
+                <h3>{habit.name}</h3>
+                <p>
+                  {habit.logs.length} {habit.logs.length === 1 ? 'dia concluído' : 'dias concluídos'}
                 </p>
               </div>
               <div>
-                {isDoneToday ? <CheckCircle2 size={32} className="text-white" /> : <Circle size={32} className="text-zinc-700" />}
+                {isDoneToday ? <CheckCircle2 size={28} /> : <Circle size={28} />}
               </div>
-            </div>
+            </button>
           );
         })}
       </div>
@@ -631,22 +715,21 @@ const ProfileView = () => {
   };
 
   return (
-    <div className="space-y-6 pb-24">
-      <Card>
-        <div className="flex items-center gap-6 mb-8">
-          <div className="w-20 h-20 bg-zinc-900 rounded-full flex items-center justify-center border border-zinc-800 relative">
-            <User size={32} className="text-zinc-500" />
-            {offlineMode && <div className="absolute -bottom-2 -right-2 bg-red-600 text-white text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-wider">OFFLINE</div>}
+    <div className="view-stack">
+      <div className="page-header"><div><p className="eyebrow">SEU ESPAÇO</p><h1>Perfil<span>.</span></h1><p>Personalize sua experiência no Equilíbrio.</p></div></div>
+      <Card className="profile-card" delay={70}>
+        <div className="profile-identity">
+          <div className="profile-avatar">
+            <User size={32} />
           </div>
           <div>
-            <h2 className="text-3xl font-black text-white">Meu Perfil</h2>
-            <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest mt-1">
-              ID: {user?.uid?.slice(0, 8)}
-            </p>
+            <p className="eyebrow">CONTA ATIVA</p>
+            <h2>{profileName || 'Seu espaço'}</h2>
+            <span className="profile-status">{offlineMode ? 'Modo offline' : 'Sincronizado na nuvem'}</span>
           </div>
         </div>
 
-        <form onSubmit={handleSave} className="space-y-6">
+        <form onSubmit={handleSave} className="space-y-6 profile-form">
           <NeonInput label="Seu Nome" placeholder="Como quer ser chamado?" value={name} onChange={e=>{ setName(e.target.value); setSaved(false); }} />
           <NeonInput label="E-mail" value={user?.email || 'Modo Visitante/Offline'} readOnly />
           {saveError && <p role="alert" className="text-sm text-red-400">{saveError}</p>}
@@ -661,12 +744,10 @@ const ProfileView = () => {
           </div>
         </form>
       </Card>
-      
-      {!offlineMode && (
-        <p className="text-center text-xs font-bold text-zinc-600 uppercase tracking-widest">
-          Sincronizado na Nuvem • {firebaseConfig.projectId}
-        </p>
-      )}
+      <Card className="profile-note" delay={130}>
+        <Sparkles size={21} />
+        <div><h3>{offlineMode ? 'Uma pausa para experimentar' : 'Seus dados, em sintonia'}</h3><p>{offlineMode ? 'No modo offline, seus registros ficam apenas nesta sessão e somem ao recarregar.' : `Sua conta está conectada ao projeto ${firebaseConfig.projectId}.`}</p></div>
+      </Card>
     </div>
   );
 };
@@ -676,18 +757,18 @@ export default function App() {
 
   return (
     <AppProvider>
-      <div className="min-h-screen bg-[#050505] text-white selection:bg-red-500/30 font-sans" style={{fontFamily: 'Nunito, sans-serif'}}>
-        {/* Main Content Area */}
-        <main className="max-w-2xl mx-auto p-6 pt-12">
-          {activeTab === 'dashboard' && <DashboardView />}
-          {activeTab === 'finances' && <FinancesView />}
-          {activeTab === 'evolution' && <EvolutionView />}
-          {activeTab === 'profile' && <ProfileView />}
+      <div className="app-shell text-white selection:bg-red-500/30">
+        <main className="app-main">
+          <div key={activeTab} className="view-enter">
+            {activeTab === 'dashboard' && <DashboardView onNavigate={setActiveTab} />}
+            {activeTab === 'finances' && <FinancesView />}
+            {activeTab === 'evolution' && <EvolutionView />}
+            {activeTab === 'profile' && <ProfileView />}
+          </div>
         </main>
 
-        {/* Floating Bottom Navigation (Bento Style) */}
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-[calc(100%-3rem)] md:max-w-md z-50">
-          <nav className="bg-[#121212]/90 backdrop-blur-xl border border-zinc-800/50 p-2 rounded-full flex justify-between items-center shadow-[0_20px_40px_rgba(0,0,0,0.8)]">
+        <div className="nav-wrap">
+          <nav className="nav-dock" aria-label="Navegação principal">
             {[
               { id: 'dashboard', icon: Home, label: 'Início' },
               { id: 'finances', icon: Wallet, label: 'Caixa' },
@@ -700,10 +781,12 @@ export default function App() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`relative flex items-center justify-center w-14 h-14 rounded-full transition-all duration-300 ${isActive ? 'bg-white text-black scale-100' : 'text-zinc-500 hover:text-white hover:bg-zinc-800/50 scale-95'}`}
+                  className={`nav-item ${isActive ? 'nav-item--active' : ''}`}
                   aria-label={tab.label}
+                  aria-current={isActive ? 'page' : undefined}
                 >
-                  <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />
+                  <Icon size={21} strokeWidth={isActive ? 2.5 : 2} />
+                  <span>{tab.label}</span>
                 </button>
               );
             })}

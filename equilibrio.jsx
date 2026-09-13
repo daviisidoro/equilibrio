@@ -125,10 +125,12 @@ const LoginScreen = ({ onOffline }) => {
     try {
       await signInWithPopup(auth, provider);
     } catch (err) {
-      if (err.code === 'auth/configuration-not-found' || err.code === 'auth/operation-not-supported-in-this-environment') {
+      if (err.code === 'auth/unauthorized-domain') {
+        setError(`Segurança do Firebase: Adicione o domínio "${window.location.hostname}" na lista de Domínios Autorizados no seu console.`);
+      } else if (err.code === 'auth/configuration-not-found' || err.code === 'auth/operation-not-supported-in-this-environment') {
         setError("Autenticação via Google desativada no console do Firebase.");
       } else if (err.code === 'auth/popup-closed-by-user') {
-        setError("O pop-up de login foi fechado.");
+        setError("O pop-up de login foi bloqueado pelo navegador ou fechado.");
       } else {
         setError(err.message);
       }
